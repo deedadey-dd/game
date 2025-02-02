@@ -21,9 +21,10 @@ def reset_game(prices):
 def next_draw(reps):
     global round
     x = 0
+    print(f'\nIn this next Round, you have to reveal {reps} numbers\n')
     while x < reps:
         new_draw = int(input(f'{Numbers[:5]}\n{Numbers[5:10]}\n{Numbers[10:15]}\n{Numbers[15:20]}\n{Numbers[20:25]}\nWhich number will you want to reveal next?\n'))
-        if new_draw not in selected_numbers:
+        if new_draw not in selected_numbers and new_draw in Numbers:
             selected_numbers.append(new_draw)
             print(f'You have chosen to reveal {new_draw}\nAnd the amount is')
             time.sleep(2)
@@ -45,7 +46,7 @@ def next_draw(reps):
             x += 1
         
         else:
-            print(f'{new_draw} has already been selected. Pick another number')
+            print(f'\n\n{new_draw} is invalid. please check and pick another number')
     round += 1
 
 
@@ -58,11 +59,11 @@ def present_offer(x):
     # print('...')
     # time.sleep(2)
     # print('...')
-    # time.sleep(2)
-    print(f'rounds = {round}')
-    print(f'game amounts{game_amounts}')
-    print(f'selected number = {selected_numbers}')
-    print(f'offers = {offers}')
+    # # time.sleep(2)
+    # print(f'rounds = {round}')
+    # print(f'game amounts{game_amounts}')
+    # print(f'selected number = {selected_numbers}')
+    # print(f'offers = {offers}')
     print(f'{offers[round - 1]}\n')
 
     response = input(f'Would you want to take the offer of {offers[round - 1]}? y/n?\n')
@@ -85,7 +86,7 @@ game_amounts = [x for x in Amounts]
 
 first_draw = int(input(f'{Numbers[:5]}\n{Numbers[5:10]}\n{Numbers[10:15]}\n{Numbers[15:20]}\n{Numbers[20:25]}\nSelect a number 1 - 25 which you believe holds the 5,000.00:\n'))
 selected_numbers.append(first_draw) # this keeps records of the numbers that have been selected
-print(f'You selected {first_draw}. Now you have to reveal 6 enteries.')
+print(f'You selected {first_draw}. Now you have to reveal 6 entries.')
 Numbers[first_draw - 1] = 'X' # this is for display purposes so that when a number is chosen it's place is marked by X
 initial_pick = Amounts[first_draw-1]
 game_amounts.remove(Amounts[first_draw - 1])
@@ -132,7 +133,7 @@ if present_offer(x = [0.3, 0.34, 0.38, 0.4, 0.45, 0.5, 0.55, 0.6]):
                                 print(f'We will now go on to reveal {remaining_num[0]}')
                                 print(f'The last Amount under {remaining_num[0]} is...')
                                 time.sleep(2)
-                                print(f'\n{Amounts[remaining_num]}\n and your initial choice {first_draw} has...')
+                                print(f'\n{Amounts[remaining_num[0]]}\n and your initial choice {first_draw} has...')
                                 time.sleep(2)
                                 print(f'...\n{Amounts[first_draw - 1]}\n')
 
