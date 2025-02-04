@@ -27,9 +27,9 @@ def next_draw(reps):
         if new_draw not in selected_numbers and new_draw in Numbers:
             selected_numbers.append(new_draw)
             print(f'You have chosen to reveal {new_draw}\nAnd the amount is')
-            time.sleep(2)
+            # time.sleep(2)
             print('...')
-            time.sleep(2)
+            # time.sleep(2)
             # print('...')
             # time.sleep(2)
             # print('...')
@@ -52,13 +52,14 @@ def next_draw(reps):
 
 def present_offer(x):
     ev = sum(game_amounts)/(len(game_amounts))
-    offers.append(int(ev * (random.choice(x))))
+    offer = int(ev * (random.choice(x)))
+    offers.append(offer)
 
-    print('Alright Alright You are on your way there.\nHowever, we have an offer for you to consider.\nThe offer is\n\n')
-    time.sleep(2)
-    # print('...')
+    print('Alright Alright You are on your way there.\nHowever, we have an offer for you to consider.\nThe offer is\n')
     # time.sleep(2)
-    # print('...')
+    print('...\n')
+    # time.sleep(2)
+    # print('...\n')
     # # time.sleep(2)
     # print(f'rounds = {round}')
     # print(f'game amounts{game_amounts}')
@@ -67,9 +68,15 @@ def present_offer(x):
     print(f'{offers[round - 1]}\n')
 
     response = input(f'Would you want to take the offer of {offers[round - 1]}? y/n?\n')
-    if response.lower() == 'y':
+    if response.lower() == 'n':
+        return True
+    else:
+        print(f'Congratulations! \nYou have earned {offers[round - 1]}\nYou have chosen to forfeit your {first_draw} which held an amount of...')
+        time.sleep(2)
+        print('...\n')
+        time.sleep(2)
+        print(f'{Amounts[first_draw - 1]}')
         return False
-    return True
 
 
 
@@ -86,7 +93,7 @@ game_amounts = [x for x in Amounts]
 
 first_draw = int(input(f'{Numbers[:5]}\n{Numbers[5:10]}\n{Numbers[10:15]}\n{Numbers[15:20]}\n{Numbers[20:25]}\nSelect a number 1 - 25 which you believe holds the 5,000.00:\n'))
 selected_numbers.append(first_draw) # this keeps records of the numbers that have been selected
-print(f'You selected {first_draw}. Now you have to reveal 6 entries.')
+print(f'You selected {first_draw}. Now you have to reveal some entries every round.')
 Numbers[first_draw - 1] = 'X' # this is for display purposes so that when a number is chosen it's place is marked by X
 initial_pick = Amounts[first_draw-1]
 game_amounts.remove(Amounts[first_draw - 1])
@@ -123,17 +130,18 @@ if present_offer(x = [0.3, 0.34, 0.38, 0.4, 0.45, 0.5, 0.55, 0.6]):
                         
 
                         # ROUND 8 - Present an offer and open 1 number if not accepted
-                        if present_offer(x = [0.7, 0.75, 0.8]):
+                        if present_offer(x = [0.65, 0.7, 0.75, 0.8]):
                             next_draw(1)
 
                             # ROUND 9 - Present an offer and open 1 number if not accepted
                             print(f'If you forfeit this offer then you are choosing to keep your initial selection.\nThis is your last chance to change your mind')
-                            if present_offer(x = [0.45, 0.5, 0.54, 0.6, 0.65, 0.7]):
-                                remaining_num = [x for x in Numbers if x not in selected_numbers]
+                            if present_offer(x = [0.68, 0.7, 0.75, 0.8]):
+                                remaining_num = [x for x in Numbers if x.isdigit()]
+                                print(f'remaining number = {remaining_num}')
                                 print(f'We will now go on to reveal {remaining_num[0]}')
                                 print(f'The last Amount under {remaining_num[0]} is...')
                                 time.sleep(2)
-                                print(f'\n{Amounts[remaining_num[0]]}\n and your initial choice {first_draw} has...')
+                                print(f'\n{Amounts[remaining_num[0] - 1]}\n and your initial choice {first_draw} has...')
                                 time.sleep(2)
                                 print(f'...\n{Amounts[first_draw - 1]}\n')
 
@@ -141,7 +149,7 @@ if present_offer(x = [0.3, 0.34, 0.38, 0.4, 0.45, 0.5, 0.55, 0.6]):
 
 
 else:
-    print(f'Congratulations! You have chosen to forfeit your {first_draw}\nYou have earned {offers[round - 1]}')
-
+    # print(f'Congratulations! You have chosen to forfeit your {first_draw}\nYou have earned {offers[round - 1]}')
+    print('Play Again!')
 
 
