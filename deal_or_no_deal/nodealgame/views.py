@@ -1,42 +1,47 @@
-from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework import viewsets
 from rest_framework.response import Response
-from .models import Game, Round
-from .serializers import GameSerializer, RoundSerializer
-# Create your views here.
+from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
+from .models import Game, Box, Round
+from .serializers import BoxSerializer, RoundSerializer, GameSerializer
 
-
-
-@api_view(['POST'])
-def save_game_progress(request):
-    user = request.user
-    if not user.is_authenticated:
-        return Response({"error": "Authentication required"}, status=401)
+class GameViewSet(viewsets.ModelViewSet):
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
     
-    # Create or Update Game
-    reserved_number = request.data.get('reserved_number')
-    final_offer = request.data.get('final_offer')
-    accepted_offer = request.data.get('accepted_offer')
-    final_outcome = request.data.get('final_outcome')
-
-    game = Game.objects.create(
-        user=user,
-        reserved_number=reserved_number,
-        final_offer=final_offer,
-        accepted_offer=accepted_offer,
-        final_outcome=final_outcome
-    )
+    @action(detail=True, methods=['post'])
+    def reveal_number(self, request, pk=None):
+        game = get_object_or_404(Game, pk=pk)
+        if not game.is_active:
+            return Response({"error": "Game is no longer active."}, status=400)
+        
+        revealed_numbers = request.data.get("numbers", [])
+        if not isinstance(revealed_numbers, list) or len(revealed_numbers) == 0:
+            return Response({"error": "Invalid numbers provided."}, status=400)
+        
+        boxes = Box.objects.filter(game=game, number__in=revealed_numbers, is_revealed=False)
+        for box in boxes:
+            box.is_revealed = True
+            box.save()
+        
+        # Create a new round
+        new_round = Round.objects.create(game=game, round_number=len(game.rounds.all()) + 1)
+        new_round.revealed_boxes.set(boxes)
+        new_round.save()
+        
+        return Response(GameSerializer(game).data)
     
-    # Save Round Details
-    rounds_data = request.data.get('rounds', [])
-    for round_data in rounds_data:
-        Round.objects.create(
-            game=game,
-            round_number=round_data['round_number'],
-            revealed_numbers=round_data['revealed_numbers'],
-            offer_made=round_data['offer_made'],
-            offer_accepted=round_data['offer_accepted']
-        )
-
-    return Response({"message": "Game progress saved successfully!"})
-
+    @action(detail=True, methods=['post'])
+    def accept_offer(self, request, pk=None):
+        game = get_object_or_404(Game, pk=pk)
+        if not game.is_active:
+            return Response({"error": "Game is no longer active."}, status=400)
+        
+        last_round = game.rounds.last()
+        if last_round and last_round.offer:
+            last_round.accepted = True
+            last_round.save()
+            game.is_active = False
+            game.save()
+            
+        return Response(GameSerializer(game).data)
